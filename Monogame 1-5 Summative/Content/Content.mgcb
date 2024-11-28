@@ -13,7 +13,13 @@
 
 #---------------------------------- Content ---------------------------------#
 
-#begin interuption.jpg
+#begin angryMobSound.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:angryMobSound.wav
+
+#begin citystreet.webp
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -23,13 +29,25 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:interuption.jpg
+/build:citystreet.webp
 
-#begin interuptionsound.mp3
-/importer:Mp3Importer
-/processor:SongProcessor
+#begin Interuption.jpg
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Interuption.jpg
+
+#begin interuptionsound.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
 /processorParam:Quality=Best
-/build:interuptionsound.mp3
+/build:interuptionsound.wav
 
 #begin intructionFont.spritefont
 /importer:FontDescriptionImporter

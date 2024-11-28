@@ -10,11 +10,11 @@ namespace Monogame_1_5_Summative
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
-        Rectangle window, kanyeRect, swiftRect;
+        Rectangle window, kanyeRect1, kanyeRect2, swiftRect, cityRect1, cityRect2;
 
-        Texture2D introTexture, kanyeTexture, stageTexture, swiftTexture, interuptionTexture;
+        Texture2D introTexture, kanyeTexture, stageTexture, swiftTexture, interuptionTexture, cityTexture;
 
-        Vector2 kanyeSpeed;
+        Vector2 kanyeSpeed, kanyeRunSpeed, backgroundSpeed;
 
         Screen screen;
 
@@ -24,8 +24,8 @@ namespace Monogame_1_5_Summative
 
         float seconds = 0f;
 
-        SoundEffect interupt;
-        SoundEffectInstance interuptInstance;
+        SoundEffect interupt, mob;
+        SoundEffectInstance interuptInstance, mobInstance;
         enum Screen
         {
             Intro,
@@ -47,11 +47,15 @@ namespace Monogame_1_5_Summative
 
             base.Initialize();
             window = new Rectangle(0, 0, 800, 500);
-            kanyeRect = new Rectangle(100, 400, 100, 100);
+            kanyeRect1 = new Rectangle(100, 400, 100, 100);
+            kanyeRect2 = new Rectangle(610, 365, 100, 100);
             kanyeSpeed = new Vector2(2, 2);
+            kanyeRunSpeed = new Vector2(0, 3);
             swiftRect = new Rectangle(340, 295, 75, 100);
+            cityRect1 = new Rectangle(0, 0, 800, 500);
+            cityRect2 = new Rectangle(800, 0, 800, 500);
 
-
+            backgroundSpeed = new Vector2(5, 0);
 
             _graphics.PreferredBackBufferWidth = 800;
             _graphics.PreferredBackBufferHeight= 500;
@@ -70,9 +74,12 @@ namespace Monogame_1_5_Summative
             kanyeTexture = Content.Load<Texture2D>("vmaKanye");
             swiftTexture = Content.Load<Texture2D>("vmaTaylor");
             interuptionTexture = Content.Load<Texture2D>("interuption");
+            cityTexture = Content.Load<Texture2D>("citystreet");
             instructionsFont = Content.Load<SpriteFont>("InstructionFont");
-            //interupt = Content.Load<SoundEffect>("interuptionsound");
-            //interuptInstance = interupt.CreateInstance();
+            interupt = Content.Load<SoundEffect>("interuptionsound");
+            interuptInstance = interupt.CreateInstance();
+            mob = Content.Load<SoundEffect>("angryMobSound");
+            mobInstance = mob.CreateInstance();
         }
 
         protected override void Update(GameTime gameTime)
@@ -95,23 +102,49 @@ namespace Monogame_1_5_Summative
             else if (screen == Screen.Stage)
             {
                 seconds += (float)gameTime.ElapsedGameTime.TotalSeconds;
-                if (kanyeRect.X < 255)
+                if (kanyeRect1.X < 255)
                 {
-                    kanyeRect.X += (int)kanyeSpeed.X;
+                    kanyeRect1.X += (int)kanyeSpeed.X;
                 }
-                else if (kanyeRect.X >= 255 && kanyeRect.Y > 305)
-                    kanyeRect.Y -= (int)kanyeSpeed.Y;
+                else if (kanyeRect1.X >= 255 && kanyeRect1.Y > 305)
+                    kanyeRect1.Y -= (int)kanyeSpeed.Y;
                 if (seconds >= 2.5 && mouseState.LeftButton == ButtonState.Pressed)
                 {
-                    
+                    interuptInstance.Play();
                     screen = Screen.Interuption;
                 }
             }
-            //else if (screen == Screen.Interuption)
 
+            else if (screen == Screen.Interuption)
+            {
+                if (interuptInstance.State == SoundState.Stopped)
+                {
+                    mobInstance.Play();
+                    mobInstance.IsLooped = true;
+                    screen = Screen.Chase;
+                }
+            }
+            
+            else if (screen == Screen.Chase)
+            {
+                cityRect1.X -= (int)backgroundSpeed.X;
+                cityRect2.X -= (int)backgroundSpeed.X;
+                kanyeRect2.Y += (int)kanyeSpeed.Y;
 
+                if (cityRect1.Right < 0)
+                {
+                    cityRect1.X = 800;
+                }
+                if (cityRect2.Right < 0)
+                {
+                    cityRect2.X = 800;
+                }
 
-                base.Update(gameTime);
+                if (kanyeRect2.Bottom >= 470 || kanyeRect2.Top <= 400)
+                    kanyeRunSpeed.Y *= -1;
+            }
+
+            base.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)
@@ -124,12 +157,15 @@ namespace Monogame_1_5_Summative
             if (screen == Screen.Intro)
             {
                 _spriteBatch.Draw(introTexture, window, Color.White);
+                _spriteBatch.DrawString(instructionsFont, ("WELCOME TO THE 2009 VMAS"), new Vector2(60, 150), Color.YellowGreen);
+                _spriteBatch.DrawString(instructionsFont, ("Click to Start"), new Vector2(250, 250), Color.White);
+
             }
 
             else if (screen == Screen.Stage)
             {
                 _spriteBatch.Draw(stageTexture, window, Color.White);
-                _spriteBatch.Draw(kanyeTexture, kanyeRect, Color.White);
+                _spriteBatch.Draw(kanyeTexture, kanyeRect1, Color.White);
                 _spriteBatch.Draw(swiftTexture, swiftRect, Color.White);
 
                 if (seconds > 2.5)
@@ -142,7 +178,14 @@ namespace Monogame_1_5_Summative
             {
                 _spriteBatch.Draw(interuptionTexture, window, Color.White);
             }
-         
+
+            else if (screen == Screen.Chase)
+            {
+                _spriteBatch.Draw(cityTexture, cityRect1, Color.White);
+                _spriteBatch.Draw(cityTexture, cityRect2, Color.White);
+                _spriteBatch.Draw(kanyeTexture, kanyeRect2, Color.White);
+
+            }
             _spriteBatch.End();
             base.Draw(gameTime);
         }
