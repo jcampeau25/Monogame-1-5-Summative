@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 
 namespace Monogame_1_5_Summative
 {
@@ -10,11 +11,11 @@ namespace Monogame_1_5_Summative
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
-        Rectangle window, kanyeRect1, kanyeRect2, swiftRect, cityRect1, cityRect2;
+        Rectangle window, kanyeRect1, kanyeRect2, swiftRect, cityRect1, cityRect2, mobRect;
 
-        Texture2D introTexture, kanyeTexture, stageTexture, swiftTexture, interuptionTexture, cityTexture;
+        Texture2D introTexture, kanyeTexture, stageTexture, swiftTexture, interuptionTexture, cityTexture, goodYeTexture, mobTexture;
 
-        Vector2 kanyeSpeed, kanyeRunSpeed, backgroundSpeed;
+        Vector2 kanyeSpeed, kanyeRunSpeed, backgroundSpeed, mobSpeed;
 
         Screen screen;
 
@@ -31,7 +32,8 @@ namespace Monogame_1_5_Summative
             Intro,
             Interuption,
             Stage,
-            Chase
+            Chase,
+            GoodEnding
         }
 
         public Game1()
@@ -50,8 +52,10 @@ namespace Monogame_1_5_Summative
             kanyeRect1 = new Rectangle(100, 400, 100, 100);
             kanyeRect2 = new Rectangle(610, 365, 100, 100);
             kanyeSpeed = new Vector2(2, 2);
-            kanyeRunSpeed = new Vector2(0, 3);
+            kanyeRunSpeed = new Vector2(0, 1);
             swiftRect = new Rectangle(340, 295, 75, 100);
+            mobRect = new Rectangle(50, 365, 200, 100);
+            mobSpeed = new Vector2(0, 1);
             cityRect1 = new Rectangle(0, 0, 800, 500);
             cityRect2 = new Rectangle(800, 0, 800, 500);
 
@@ -75,6 +79,8 @@ namespace Monogame_1_5_Summative
             swiftTexture = Content.Load<Texture2D>("vmaTaylor");
             interuptionTexture = Content.Load<Texture2D>("interuption");
             cityTexture = Content.Load<Texture2D>("citystreet");
+            mobTexture = Content.Load<Texture2D>("angrymob");
+            goodYeTexture = Content.Load<Texture2D>("goodKanye");
             instructionsFont = Content.Load<SpriteFont>("InstructionFont");
             interupt = Content.Load<SoundEffect>("interuptionsound");
             interuptInstance = interupt.CreateInstance();
@@ -129,19 +135,23 @@ namespace Monogame_1_5_Summative
             {
                 cityRect1.X -= (int)backgroundSpeed.X;
                 cityRect2.X -= (int)backgroundSpeed.X;
-                kanyeRect2.Y += (int)kanyeSpeed.Y;
+                kanyeRect2.Y += (int)kanyeRunSpeed.Y;
+                mobRect.Y -= (int)mobSpeed.Y;
 
-                if (cityRect1.Right < 0)
+                if (cityRect1.Right <= 0)
                 {
                     cityRect1.X = 800;
                 }
-                if (cityRect2.Right < 0)
+                if (cityRect2.Right <= 0)
                 {
                     cityRect2.X = 800;
                 }
 
-                if (kanyeRect2.Bottom >= 470 || kanyeRect2.Top <= 400)
+                if (kanyeRect2.Bottom >= 500 || kanyeRect2.Top <= 350)
                     kanyeRunSpeed.Y *= -1;
+
+                if (mobRect.Bottom >= 500 || mobRect.Top < 350)
+                    mobSpeed.Y *= -1;
             }
 
             base.Update(gameTime);
@@ -172,6 +182,11 @@ namespace Monogame_1_5_Summative
                 {
                     _spriteBatch.DrawString(instructionsFont, ("Click To Interupt Taylor"), new Vector2(10, 10), Color.White);
                 }
+
+                if (seconds >= 10)
+                {
+                    screen = Screen.GoodEnding;
+                }
             }
 
             else if (screen == Screen.Interuption)
@@ -184,8 +199,15 @@ namespace Monogame_1_5_Summative
                 _spriteBatch.Draw(cityTexture, cityRect1, Color.White);
                 _spriteBatch.Draw(cityTexture, cityRect2, Color.White);
                 _spriteBatch.Draw(kanyeTexture, kanyeRect2, Color.White);
-
+                _spriteBatch.Draw(mobTexture, mobRect, Color.White);
             }
+
+            else if (screen == Screen.GoodEnding)
+            {
+                _spriteBatch.Draw(goodYeTexture, window, Color.White);
+                _spriteBatch.DrawString(instructionsFont, ("GOOD JOB! YOU LET TAYLOR FINISH"), new Vector2(10, 20), Color.Black);
+            }
+
             _spriteBatch.End();
             base.Draw(gameTime);
         }
