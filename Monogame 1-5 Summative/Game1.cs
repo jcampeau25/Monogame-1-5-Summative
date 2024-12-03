@@ -11,9 +11,9 @@ namespace Monogame_1_5_Summative
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
-        Rectangle window, kanyeRect1, kanyeRect2, swiftRect, cityRect1, cityRect2, mobRect;
+        Rectangle window, kanyeRect1, kanyeRect2, swiftRect, cityRect1, cityRect2, mobRect, nextVidRect, pfpRect;
 
-        Texture2D introTexture, kanyeTexture, stageTexture, swiftTexture, interuptionTexture, cityTexture, goodYeTexture, mobTexture;
+        Texture2D introTexture, kanyeTexture, stageTexture, swiftTexture, interuptionTexture, cityTexture, goodYeTexture, mobTexture, endTexture, nextVidTexture, yePfpTexture;
 
         Vector2 kanyeSpeed, kanyeRunSpeed, backgroundSpeed, mobSpeed;
 
@@ -33,7 +33,8 @@ namespace Monogame_1_5_Summative
             Interuption,
             Stage,
             Chase,
-            GoodEnding
+            GoodEnding,
+            End
         }
 
         public Game1()
@@ -58,6 +59,8 @@ namespace Monogame_1_5_Summative
             mobSpeed = new Vector2(0, 1);
             cityRect1 = new Rectangle(0, 0, 800, 500);
             cityRect2 = new Rectangle(800, 0, 800, 500);
+            nextVidRect = new Rectangle(438, 262, 262, 168);
+            pfpRect = new Rectangle(100, 210, 100, 100);
 
             backgroundSpeed = new Vector2(5, 0);
 
@@ -80,6 +83,9 @@ namespace Monogame_1_5_Summative
             interuptionTexture = Content.Load<Texture2D>("interuption");
             cityTexture = Content.Load<Texture2D>("citystreet");
             mobTexture = Content.Load<Texture2D>("angrymob");
+            endTexture = Content.Load<Texture2D>("EndScreen");
+            nextVidTexture = Content.Load<Texture2D>("powerMV");
+            yePfpTexture = Content.Load<Texture2D>("kanyePFP");
             goodYeTexture = Content.Load<Texture2D>("goodKanye");
             instructionsFont = Content.Load<SpriteFont>("InstructionFont");
             interupt = Content.Load<SoundEffect>("interuptionsound");
@@ -123,6 +129,7 @@ namespace Monogame_1_5_Summative
 
             else if (screen == Screen.Interuption)
             {
+                seconds = 0;
                 if (interuptInstance.State == SoundState.Stopped)
                 {
                     mobInstance.Play();
@@ -196,12 +203,22 @@ namespace Monogame_1_5_Summative
 
             else if (screen == Screen.Chase)
             {
+                seconds += (float)gameTime.ElapsedGameTime.TotalSeconds;
                 _spriteBatch.Draw(cityTexture, cityRect1, Color.White);
                 _spriteBatch.Draw(cityTexture, cityRect2, Color.White);
                 _spriteBatch.Draw(kanyeTexture, kanyeRect2, Color.White);
                 _spriteBatch.Draw(mobTexture, mobRect, Color.White);
+
+                if (seconds >= 10)
+                    screen = Screen.End;
             }
 
+            else if (screen == Screen.End)
+            {
+                _spriteBatch.Draw(endTexture, window, Color.White);
+                _spriteBatch.Draw(nextVidTexture, nextVidRect, Color.White);
+                _spriteBatch.Draw(yePfpTexture, pfpRect, Color.White);
+            }
             else if (screen == Screen.GoodEnding)
             {
                 _spriteBatch.Draw(goodYeTexture, window, Color.White);
